@@ -14,14 +14,22 @@ app.get("/", function(req,res) {
 app.post("/", function(req,res) {
   //first parameter: url that we are making request to
   //call back function
-  request("https://apiv2.bitcoinaverage.com/indices/global/ticker/BTCUSD", function (error, response, body) {
+  var crypto = req.body.crypto;
+  var fiat = req.body.fiat;
+  var baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/";
+  request(baseURL + crypto +fiat, function (error, response, body) {
     //change json object to javascript object
     var data = JSON.parse(body);
     var price = data.last;
-    console.log(price);
-    res.send("<h1> The price of bitcoin is " + price + " USD </h1>");
+    var today = data.display_timestamp;
+
+    //only 1 res.send is accepted =? use res.write to write all, then send to end
+    res.write("<p>The current date is " + today +"</p>");
+    res.write("<h1>The price of " + crypto + " is " + price + fiat + "</h1>");
+    res.send();
   });
 });
+
 app.listen(3000, function() {
   console.log("Server on port 3000");
 });
