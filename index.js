@@ -14,18 +14,28 @@ app.get("/", function(req,res) {
 app.post("/", function(req,res) {
   //first parameter: url that we are making request to
   //call back function
+  console.log(req.body);
   var crypto = req.body.crypto;
   var fiat = req.body.fiat;
-  var baseURL = "https://apiv2.bitcoinaverage.com/indices/global/ticker/";
-  request(baseURL + crypto +fiat, function (error, response, body) {
+  var amount = req.body.amount;
+  var option = {
+    url: "https://apiv2.bitcoinaverage.com/convert/global",
+    method: "GET",
+    qs: {
+    from: crypto,
+    to: fiat,
+    amount: amount
+    }
+  }
+  request(option, function (error, response, body) {
     //change json object to javascript object
     var data = JSON.parse(body);
-    var price = data.last;
-    var today = data.display_timestamp;
+    var price = data.price;
+    var today = data.time;
 
     //only 1 res.send is accepted =? use res.write to write all, then send to end
     res.write("<p>The current date is " + today +"</p>");
-    res.write("<h1>The price of " + crypto + " is " + price + fiat + "</h1>");
+    res.write("<h1>"+amount +" of "+crypto +" is "+ price + fiat + "</h1>");
     res.send();
   });
 });
